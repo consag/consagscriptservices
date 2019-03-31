@@ -2,21 +2,21 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
          version="3.0">
-  <module-name>ConsagDeploy</module-name>
-  <display-name>Consag Deploy</display-name>
-  <description>Consag Artifact generator and deploy services</description>
+  <module-name>RunScript</module-name>
+  <display-name>Run Script Module</display-name>
+  <description>Run Script Services</description>
   <session-config>
     <tracking-mode>URL</tracking-mode>
   </session-config>
   <servlet>
-    <display-name>Consag Artifact Generation</display-name>
-    <servlet-name>ConsagArtifactServlet</servlet-name>
-    <servlet-class>nl.consag.deploy.ArtifactServlet</servlet-class>
+    <display-name>Script Servlet</display-name>
+    <servlet-name>scriptservlet</servlet-name>
+    <servlet-class>nl.jacbeekers.runscript.ArtifactServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
     <enabled>true</enabled>
   </servlet>
   <servlet-mapping>
-    <servlet-name>ConsagArtifactServlet</servlet-name>
-    <url-pattern>artifacts/*</url-pattern>
+    <servlet-name>scriptservlet</servlet-name>
+    <url-pattern>runscript/*</url-pattern>
   </servlet-mapping>
 </web-app>

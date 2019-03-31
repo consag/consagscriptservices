@@ -1,4 +1,4 @@
-package nl.consag.deploy.supporting;
+package nl.jacbeekers.runscript.supporting;
 
 /**
  * @author Jac. Beekers @ consag consultancy services b.v.
@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class DeployConstants {
+public class scriptConstants {
 
     public static final String YES = "Yes";
         public static final String Y = "Y";
@@ -80,7 +80,7 @@ public class DeployConstants {
         public static final String DAC_PROPERTIES =CONFIGDIRECTORY + "dac.properties";
         public static final String ENVIRONMENT_PROPERTIES =CONFIGDIRECTORY + "environment.properties";
         public static final String INFA_PROCESS_PROPERTIES =CONFIGDIRECTORY + "infaprocess.properties";
-        public static final String CONSAGDEPLOY_PROPERTIES = "consagdeploy.properties";
+        public static final String RUNSCRIPT_PROPERTIES = "runscript.properties";
         public static final String ACTION_PROPERTIES ="action.properties";
         public static final String DEFAULT_APPLICATION ="IDQ";
 
@@ -131,7 +131,7 @@ public class DeployConstants {
         public static final String ENGLISH = "ENU";
         public static final String DUTCH = "NLD";
         private static final String[] MESSAGE_LANGUAGES = new String[] {
-            DeployConstants.ENGLISH, DeployConstants.DUTCH
+            scriptConstants.ENGLISH, scriptConstants.DUTCH
         };
         public static final String NOERRORS="No errors encountered";
         

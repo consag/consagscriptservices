@@ -1,11 +1,13 @@
-package nl.consag.deploy;
+package nl.jacbeekers.runscript;
 /**
  * @author Jac. Beekers @ consag consultancy services b.v.
- * @version 20160827.0
+ * @version 20190330.0
  * @since   December 2015
  *
  * 20160827.0 : Introduced logURL
- * 
+ * 20190331.0 : Refactored
+ * http://<jettyhost>:8080/scriptservlet-20190330.0/runscript?application=APP&type=DB2&action=SetPassword
+ * expects: ./deployments/scripts/DB2SetPassword.sh
  */
 
 import java.io.File;
@@ -24,28 +26,25 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 
-import nl.consag.deploy.supporting.DeployConstants;
+import nl.jacbeekers.runscript.supporting.consagException;
 
-import nl.consag.deploy.supporting.consagException;
-
+import nl.jacbeekers.runscript.supporting.scriptConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ArtifactServlet extends HttpServlet {
     
-    @SuppressWarnings("compatibility:-9073628297096402944")
-    private static final long serialVersionUID = 3459314780608223535L;
-    private String logFileName = DeployConstants.NOT_INITIALIZED;
-    private String artifactType = DeployConstants.NOT_INITIALIZED;
-    private String action = DeployConstants.NOT_INITIALIZED;
-    private String resultCode =DeployConstants.OK;
-    private String resultMessage =DeployConstants.NOT_INITIALIZED;
-    private String errorMessage =DeployConstants.NOERRORS;
+    private String logFileName = scriptConstants.NOT_INITIALIZED;
+    private String artifactType = scriptConstants.NOT_INITIALIZED;
+    private String action = scriptConstants.NOT_INITIALIZED;
+    private String resultCode = scriptConstants.OK;
+    private String resultMessage = scriptConstants.NOT_INITIALIZED;
+    private String errorMessage = scriptConstants.NOERRORS;
     
-    public static final String version ="20160827.0";
+    public static final String version ="20190331.0";
     private static int logLevel=3;
-    private String application =DeployConstants.DEFAULT_APPLICATION;
-    private String logURL = DeployConstants.NOT_INITIALIZED;
+    private String application = scriptConstants.DEFAULT_APPLICATION;
+    private String logURL = scriptConstants.NOT_INITIALIZED;
 
 
     /**
@@ -66,7 +65,7 @@ public class ArtifactServlet extends HttpServlet {
         // Type of artifact
 
         String osName =System.getProperty("os.name");
-        String scriptExtension =DeployConstants.NOT_FOUND;
+        String scriptExtension = scriptConstants.NOT_FOUND;
         Map keyVals=null;
                             
         try {
@@ -85,22 +84,22 @@ public class ArtifactServlet extends HttpServlet {
         }
         
         if(osName.startsWith("Windows")) {
-            scriptExtension =DeployConstants.SCRIPT_EXTENSION_WINDOWS;
+            scriptExtension = scriptConstants.SCRIPT_EXTENSION_WINDOWS;
         } else {
-            scriptExtension =DeployConstants.SCRIPT_EXTENSION_LINUX;
+            scriptExtension = scriptConstants.SCRIPT_EXTENSION_LINUX;
         }
         
-        String scriptName=DeployConstants.NOT_INITIALIZED;
+        String scriptName= scriptConstants.NOT_INITIALIZED;
         
         List<String> allowed =getAllowedActions(getApplication());
-        if(!DeployConstants.NOT_FOUND.equals(allowed.get(0))) {
+        if(!scriptConstants.NOT_FOUND.equals(allowed.get(0))) {
          if(!allowed.contains(getAction())) {
             String errCode="CNSG-DPLY-ERROR-0001";
             String err="Invalid type-action combination >" + getArtifactType() +"-" + getAction() + "< for application >" + getApplication() +"<.";
             setError(errCode,err);
             try {
                 writeResponse(response);
-            } catch (consagException c) {
+            } catch (nl.jacbeekers.runscript.supporting.consagException c) {
                 throw new IOException(c.toString());
             }
          }
@@ -116,13 +115,13 @@ public class ArtifactServlet extends HttpServlet {
             params.add(val[0]);
         }
         
-        RunScript rs = new RunScript (scriptName, params);
+        RunScript rs = new RunScript(scriptName, params);
         rs.start();
         setLogFileName(rs.getLogFileName());
         setLogURL(rs.getLogURL());
 
-        if(DeployConstants.OK.equals(rs.getResultCode())) {
-            setResult(DeployConstants.OK, rs.getResultMessage());
+        if(scriptConstants.OK.equals(rs.getResultCode())) {
+            setResult(scriptConstants.OK, rs.getResultMessage());
         } else {
             setError("CNSG-DPLY-ERROR-0003","Script failed: " +rs.getErrorMessage()
                      +". Log file: " + getLogFileName());
@@ -131,7 +130,7 @@ public class ArtifactServlet extends HttpServlet {
 
         try {
             writeResponse(response);
-        } catch (consagException c) {
+        } catch (nl.jacbeekers.runscript.supporting.consagException c) {
             throw new IOException(c.toString());
         }
 
@@ -139,21 +138,21 @@ public class ArtifactServlet extends HttpServlet {
 
     private List<String> getAllowedActions(String app) {
 
-        String allowedActions =DeployConstants.NOT_FOUND;
+        String allowedActions = scriptConstants.NOT_FOUND;
         List<String> listedActions = new ArrayList<String>();
         
         try {
-        File file = new File(DeployConstants.ACTION_PROPERTIES);
+        File file = new File(scriptConstants.ACTION_PROPERTIES);
         FileInputStream fileInput = new FileInputStream(file);
         Properties actionProp = new Properties();
         actionProp.load(fileInput);
         fileInput.close();
         
-        allowedActions = actionProp.getProperty(app+".ALLOWEDACTIONS", DeployConstants.NOT_FOUND);
+        allowedActions = actionProp.getProperty(app+".ALLOWEDACTIONS", scriptConstants.NOT_FOUND);
         } catch (FileNotFoundException e) {
-            allowedActions = DeployConstants.NOT_FOUND;
+            allowedActions = scriptConstants.NOT_FOUND;
             } catch (IOException e) {
-                allowedActions = DeployConstants.NOT_FOUND;
+                allowedActions = scriptConstants.NOT_FOUND;
             }
         
         listedActions = Arrays.asList(allowedActions.split(","));
@@ -164,13 +163,13 @@ public class ArtifactServlet extends HttpServlet {
 
     private void setArtifactType(String type) {
         if(type == null) 
-            this.artifactType =DeployConstants.NOT_PROVIDED;
+            this.artifactType = scriptConstants.NOT_PROVIDED;
         else
             this.artifactType =type;
     }
     private void setApplication(String app) {
         if(app == null)
-            this.application =DeployConstants.DEFAULT_APPLICATION;
+            this.application = scriptConstants.DEFAULT_APPLICATION;
         else
             this.application =app;
     }
@@ -188,7 +187,7 @@ public class ArtifactServlet extends HttpServlet {
 
     private void setAction(String action) {
         if(action == null) 
-            this.action=DeployConstants.NOT_PROVIDED; 
+            this.action= scriptConstants.NOT_PROVIDED;
         else
             this.action =action;
     }
@@ -227,8 +226,8 @@ public class ArtifactServlet extends HttpServlet {
     private void writeResponse(HttpServletResponse response) throws consagException {
         String myName="writeResponse";
         
-        response.setContentType(DeployConstants.ARTIFACT_RESPONSE_TYPE);
-        response.addHeader("Content-Type", DeployConstants.ARTIFACT_RESPONSE_TYPE);
+        response.setContentType(scriptConstants.ARTIFACT_RESPONSE_TYPE);
+        response.addHeader("Content-Type", scriptConstants.ARTIFACT_RESPONSE_TYPE);
         PrintWriter out;
         try {
             out = response.getWriter();
@@ -262,12 +261,12 @@ public class ArtifactServlet extends HttpServlet {
     private void setError(String errCode, String err) {
         setResultCode(errCode);
         setErrorMessage(err);
-        setResultMessage(DeployConstants.ERROR);
+        setResultMessage(scriptConstants.ERROR);
     }
 
     private void setResult(String code, String msg) {
         setResultCode(code);
-        setErrorMessage(DeployConstants.NOERRORS);
+        setErrorMessage(scriptConstants.NOERRORS);
         setResultMessage(msg);
     }
 
