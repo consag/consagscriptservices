@@ -18,25 +18,25 @@ import nl.jacbeekers.runscript.supporting.Logging;
 
 /**
  * @author Jac. Beekers @ consag consultancy services b.v.
- * @version 20190330.0
+ * @version 20190401.0
  * @since   December 2015
  *
  * 20160827.0 : Introduced logURL
  * 
  */
 public class RunScript {
-    private String version = "20190330.0";
+    private String version = "20190401.0";
 
     private String className = "RunScript";
     private String logFileName = scriptConstants.NOT_INITIALIZED;
-    private String context = scriptConstants.DEFAULT;
+//    private String context = scriptConstants.DEFAULT;
     private String startDate = scriptConstants.NOT_INITIALIZED;
     private int logLevel = 5;
     private int logEntries = 0;
 
     private static String cmdName = scriptConstants.NOT_INITIALIZED;
-    private String baseDir = scriptConstants.DEFAULT_BASEDEPLOYDIR;
-    private String deployScriptDir = scriptConstants.DEFAULT_DEPLOYSCRIPTDIR;
+    private String baseDir = scriptConstants.DEFAULT_BASESCRIPTDIR;
+    private String deployScriptDir = scriptConstants.DEFAULT_SCRIPTDIR;
     private String jettylogurl = scriptConstants.DEFAULT_JETTYLOGURL;
 
     private String resultCode = scriptConstants.NOT_INITIALIZED;
@@ -191,16 +191,19 @@ public class RunScript {
         String myName="getProperties";
         String myArea="init";
 
-        scriptSupport depSupport = new scriptSupport();
-        baseDir = depSupport.getPropertyValue(scriptConstants.KEY_BASEDEPLOYDIR);
+        log(myName, scriptConstants.INFO, myArea, "current directory is >" + System.getProperty("user.dir") +"<.");
+        scriptSupport scriptSupport = new scriptSupport();
+        baseDir = scriptSupport.getPropertyValue(scriptConstants.KEY_BASESCRIPTDIRECTORY);
         if (scriptConstants.NOT_FOUND.equals(baseDir))
-            baseDir = scriptConstants.DEFAULT_BASEDEPLOYDIR;
-        deployScriptDir = depSupport.getPropertyValue(scriptConstants.KEY_DEPLOYSCRIPTDIR);
+            log(myName, scriptConstants.INFO, myArea, "Property >" + scriptConstants.KEY_BASESCRIPTDIRECTORY + "< not found. Using default (" +scriptConstants.DEFAULT_BASESCRIPTDIR +").");
+            baseDir = scriptConstants.DEFAULT_BASESCRIPTDIR;
+        deployScriptDir = scriptSupport.getPropertyValue(scriptConstants.KEY_SCRIPTDIR);
         if (scriptConstants.NOT_FOUND.equals(deployScriptDir))
-            deployScriptDir = scriptConstants.DEFAULT_DEPLOYSCRIPTDIR;
+            log(myName, scriptConstants.INFO, myArea, "Property >" + scriptConstants.KEY_SCRIPTDIR + "< not found. Using default (" +scriptConstants.DEFAULT_SCRIPTDIR +").");
+            deployScriptDir = scriptConstants.DEFAULT_SCRIPTDIR;
         if (!deployScriptDir.startsWith("/"))
             deployScriptDir = baseDir + "/" + deployScriptDir;
-        sTimeout =depSupport.getPropertyValue(scriptConstants.KEY_DEFAULT_SCRIPT_TIMEOUT);
+        sTimeout =scriptSupport.getPropertyValue(scriptConstants.KEY_DEFAULT_SCRIPT_TIMEOUT);
         if(sTimeout.startsWith(scriptConstants.NOT_FOUND)) {
             log(myName, scriptConstants.INFO, myArea, "Property >" + scriptConstants.KEY_DEFAULT_SCRIPT_TIMEOUT + "< not found. Using default (" +Integer.toString(scriptConstants.DEFAULT_TIMEOUT_SCRIPT_MINUTES) +").");
             timeout = scriptConstants.DEFAULT_TIMEOUT_SCRIPT_MINUTES;
@@ -209,8 +212,9 @@ public class RunScript {
             timeout =Integer.parseInt(sTimeout);
         }
 
-        jettylogurl = depSupport.getPropertyValue(scriptConstants.KEY_JETTYLOGURL);
+        jettylogurl = scriptSupport.getPropertyValue(scriptConstants.KEY_JETTYLOGURL);
         if (scriptConstants.NOT_FOUND.equals(jettylogurl))
+            log(myName, scriptConstants.INFO, myArea, "Property >" + scriptConstants.KEY_JETTYLOGURL + "< not found. Using default (" +scriptConstants.DEFAULT_JETTYLOGURL +").");
             jettylogurl = scriptConstants.DEFAULT_JETTYLOGURL;
 
     }

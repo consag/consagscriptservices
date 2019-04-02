@@ -1,0 +1,1 @@
+Check github release for the latest version, eg. scriptservlet-20190330.0.war

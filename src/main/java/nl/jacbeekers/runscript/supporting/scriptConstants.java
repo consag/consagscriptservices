@@ -148,21 +148,24 @@ public class scriptConstants {
         public static final String DATEFORMAT_FOR_LOGENTRY ="yyyy-MM-dd HH:mm:ss";
 
         /*
-         * Keys for the properties file consagdeploy.properties
+         * Keys for the properties file runscript.properties
          */
-        public static final String KEY_BASEDEPLOYDIR ="basedeploydirectory";
-        public static final String DEFAULT_BASEDEPLOYDIR ="./deployments";
+        public static final String KEY_BASESCRIPTDIRECTORY ="basescriptdirectory";
+        public static final String DEFAULT_BASESCRIPTDIR =".";
         public static final String KEY_LOGDIR ="logdirectory";
         public static final String DEFAULT_LOGDIR ="./log";
-        public static final String KEY_DEPLOYSCRIPTDIR ="deployscriptdirectory";
-        public static final String DEFAULT_DEPLOYSCRIPTDIR ="scripts";
+        public static final String KEY_SCRIPTDIR ="scriptdirectory";
+        public static final String DEFAULT_SCRIPTDIR ="scripts";
         public static final String KEY_JETTYLOGURL ="jettylogurl";
-        /* Assume Jetty (or any other webserver has contextPath /deploylogs mapped to deployment log directory
+        /* Assume Jetty (or any other webserver has contextPath /logs mapped to script log directory
          */
-        public static final String DEFAULT_JETTYLOGURL ="http://localhost:8080/deploylogs";
+        public static final String DEFAULT_JETTYLOGURL ="http://localhost:8080/logs";
         
         public static final String KEY_DEFAULT_SCRIPT_TIMEOUT="timeout";
         public static final int DEFAULT_TIMEOUT_SCRIPT_MINUTES=5;
+
+        public static final String INFA_DEFAULT_TARGET_ENVIRONMENT ="DEV";
+        public static final String INFA_DEFAULT_TARGET_CONNECTION ="conn";
         
         public static final String TMPFILE_PREFIX="consag.";
         public static final String TMPFILE_SUFFIX=".tmp";

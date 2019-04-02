@@ -11,7 +11,7 @@
   <servlet>
     <display-name>Script Servlet</display-name>
     <servlet-name>scriptservlet</servlet-name>
-    <servlet-class>nl.jacbeekers.runscript.ArtifactServlet</servlet-class>
+    <servlet-class>nl.jacbeekers.runscript.RunScriptServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
     <enabled>true</enabled>
   </servlet>

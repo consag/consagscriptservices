@@ -32,7 +32,7 @@ import nl.jacbeekers.runscript.supporting.scriptConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class ArtifactServlet extends HttpServlet {
+public class RunScriptServlet extends HttpServlet {
     
     private String logFileName = scriptConstants.NOT_INITIALIZED;
     private String artifactType = scriptConstants.NOT_INITIALIZED;
@@ -41,10 +41,18 @@ public class ArtifactServlet extends HttpServlet {
     private String resultMessage = scriptConstants.NOT_INITIALIZED;
     private String errorMessage = scriptConstants.NOERRORS;
     
-    public static final String version ="20190331.0";
+    public static final String version ="20190401.0";
     private static int logLevel=3;
     private String application = scriptConstants.DEFAULT_APPLICATION;
     private String logURL = scriptConstants.NOT_INITIALIZED;
+
+
+
+    //infa connection settings
+    private String targetEnvironment = scriptConstants.INFA_DEFAULT_TARGET_ENVIRONMENT;
+    private String targetConnection = scriptConstants.INFA_DEFAULT_TARGET_CONNECTION;
+    private String targetUsername = null;
+    private String targetPassword = null;
 
 
     /**
@@ -55,23 +63,16 @@ public class ArtifactServlet extends HttpServlet {
         super.init(config);
     }
 
-    /**Process the HTTP doGet request.
-     * @param request
-     * @param response
-     * @throws ServletException
-     * @throws IOException
-     */
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Type of artifact
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String osName =System.getProperty("os.name");
-        String scriptExtension = scriptConstants.NOT_FOUND;
-        Map keyVals=null;
-                            
         try {
             setApplication(request.getParameter("application"));
+            log("application is >" +getApplication() +"<.");
             setArtifactType(request.getParameter("type"));
+            log("type is >" +getArtifactType() +"<.");
             setAction(request.getParameter("action"));
+            log("action is >" +getAction() +"<.");
         } catch (Exception e) {
             log(e.toString());
             setError("CNSG-DPLY-ERROR-0004","Exception occurred: " +e.toString());
@@ -82,7 +83,65 @@ public class ArtifactServlet extends HttpServlet {
             }
             return;
         }
-        
+
+            setTargetEnvironment(request.getParameter("targetenvironment"));
+            log("targetenvironment is >" +getTargetEnvironment() +"<.");
+            setTargetConnection(request.getParameter("targetconnection"));
+            log("targetconnection is >" +getTargetConnection() +"<.");
+            setTargetUsername(request.getParameter("targetusername"));
+            log("targetusername is >" +getTargetUsername() +"<");
+            setTargetPassword(request.getParameter("targetpassword"));
+            log("targetpassword is >" +getTargetPassword() +"<.");
+
+/*        setError("CNSG-RS_ERROR-0010", "Not yet implemented.");
+
+
+        try {
+            writeResponse(response);
+        } catch (consagException c) {
+            throw new IOException(c.toString());
+        }
+        return;
+*/
+        runTheScript(request, response);
+
+
+
+    }
+
+    /**Process the HTTP doGet request.
+     * @param request
+     * @param response
+     * @throws ServletException
+     * @throws IOException
+     */
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        try {
+            setApplication(request.getParameter("application"));
+            setArtifactType(request.getParameter("type"));
+            setAction(request.getParameter("action"));
+        } catch (Exception e) {
+            log(e.toString());
+            setError("CNSG-DPLY-ERROR-0004", "Exception occurred: " + e.toString());
+            try {
+                writeResponse(response);
+            } catch (consagException c) {
+                throw new IOException(c.toString());
+            }
+            return;
+        }
+
+        runTheScript(request, response);
+    }
+
+    void runTheScript(HttpServletRequest request, HttpServletResponse response) throws IOException{
+
+        Map keyVals = null;
+        String osName = System.getProperty("os.name");
+        String scriptExtension = scriptConstants.NOT_FOUND;
+
         if(osName.startsWith("Windows")) {
             scriptExtension = scriptConstants.SCRIPT_EXTENSION_WINDOWS;
         } else {
@@ -114,7 +173,7 @@ public class ArtifactServlet extends HttpServlet {
             String[] val =(String[])keyVals.get(key);   
             params.add(val[0]);
         }
-        
+
         RunScript rs = new RunScript(scriptName, params);
         rs.start();
         setLogFileName(rs.getLogFileName());
@@ -303,5 +362,38 @@ public class ArtifactServlet extends HttpServlet {
     private String getLogURL() {
         return logURL;
     }
+
+    public String getTargetEnvironment() {
+        return targetEnvironment;
+    }
+
+    private void setTargetEnvironment(String targetEnvironment) {
+        this.targetEnvironment = targetEnvironment;
+    }
+
+    public String getTargetConnection() {
+        return targetConnection;
+    }
+
+    private void setTargetConnection(String targetConnection) {
+        this.targetConnection = targetConnection;
+    }
+
+    public String getTargetUsername() {
+        return targetUsername;
+    }
+
+    private void setTargetUsername(String targetUsername) {
+        this.targetUsername = targetUsername;
+    }
+
+    private String getTargetPassword() {
+        return targetPassword;
+    }
+
+    private void setTargetPassword(String targetPassword) {
+        this.targetPassword = targetPassword;
+    }
+
 }
 
