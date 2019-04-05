@@ -38,6 +38,10 @@ procName="MAIN"
 ##
 parsearguments $@
 
+if [ -z "$targetPassword" ] ; then
+   targetPassword=$TARGET_PASSWORD
+fi
+
 encryptWithPmpasswd $targetPassword
 rc=$?
 procName="MAIN"
